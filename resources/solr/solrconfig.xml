@@ -105,7 +105,7 @@
         <useCompoundFile>false</useCompoundFile>
         <ramBufferSizeMB>100</ramBufferSizeMB>
         <mergeFactor>10</mergeFactor>
-
+        <rt>true</rt>
         <!-- Unlock On Startup
 
              If true, unlock any held write or commit locks on startup.
@@ -205,7 +205,7 @@
                        triggering a new commit.
           -->
         <autoSoftCommit>
-            <maxTime>1000</maxTime>
+            <maxTime>250</maxTime>
         </autoSoftCommit>
 
         <!-- Update Related Event Listeners
@@ -328,10 +328,10 @@
                    and old cache.
           -->
         <filterCache
-            class="solr.search.SolrFilterCache"
-            autowarmCount="90%"
-            lowWaterMarkMB="128"
-            highWaterMarkMB="256" />
+                class="solr.search.SolrFilterCache"
+                autowarmCount="90%"
+                lowWaterMarkMB="128"
+                highWaterMarkMB="256" />
 
         <!-- Query Result Cache
 

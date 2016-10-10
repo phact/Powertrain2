@@ -16,19 +16,21 @@ import services.Kafka
 
 
 @Singleton
-class PowertrainController @Inject()(kafka: Kafka, system: ActorSystem) extends Controller {
+class PowertrainController @Inject()(kafka: Kafka, system: ActorSystem, configuration: play.api.Configuration) extends Controller {
 
   val atomicCounter = new AtomicInteger()
 
   val producerSettings = ProducerSettings(system, new StringSerializer, new StringSerializer)
-    .withBootstrapServers("localhost:9092")
+    .withBootstrapServers(configuration.getString("powertrain.kafkaHost").get)
+
+  println(s"NEW producer settings: $producerSettings")
 
   implicit val messageFlowTransformer = MessageFlowTransformer.jsonMessageFlowTransformer[VehicleUpdate, String]
-
 
   def vehicleStream = WebSocket.accept[VehicleUpdate, String] { request =>
     val sink = Flow[VehicleUpdate]
       .map(vehicleUpdate => {
+          println(s"vehicle update: $vehicleUpdate")
           val record: ProducerRecord[String, String] = getProducerRecord(vehicleUpdate)
           ProducerMessage.Message(record, vehicleUpdate)
         }
@@ -46,11 +48,11 @@ class PowertrainController @Inject()(kafka: Kafka, system: ActorSystem) extends 
 
   def getProducerRecord(vehicleUpdate: VehicleUpdate): ProducerRecord[String, String] = {
     vehicleUpdate match {
-      case vehicleLocation@VehicleLocation(vehicle, location, speed, acceleration) => {
+      case vehicleLocation@VehicleLocation(vehicle, location, speed, acceleration, elapsed_time) => {
         val key = s"${vehicleLocation.vehicle}:$atomicCounter.getAndIncrement"
         new ProducerRecord[String, String]("vehicle_events", key, "location," + vehicleLocation.toString)
       }
-      case vehicleEvent@VehicleEvent(vehicle, name, value) => {
+      case vehicleEvent@VehicleEvent(vehicle, name, value, elapsed_time) => {
         val key = s"${vehicleEvent.vehicle}:$atomicCounter.getAndIncrement"
         new ProducerRecord[String, String]("vehicle_events", key, "event," + vehicleEvent.toString)
       }

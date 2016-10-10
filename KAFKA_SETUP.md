@@ -56,7 +56,7 @@ bin/kafka-topics.sh --list --zookeeper localhost:2181
 
 bin/kafka-topics.sh --describe --topic vehicle_events --zookeeper localhost:2181
 
-bin/kafka-console-consumer.sh --zookeeper localhost:2181 --topic vehicle_events --from-beginning
+bin/kafka-console-consumer.sh --zookeeper 172.31.14.225:2181 --topic vehicle_events --from-beginning
 
 
 bin/kafka-topics.sh --zookeeper localhost:2181 --delete --topic vehicle_events

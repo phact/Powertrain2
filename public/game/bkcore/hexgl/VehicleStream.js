@@ -1,9 +1,13 @@
 var bkcore = bkcore || {};
 bkcore.hexgl = bkcore.hexgl || {};
 
+
 bkcore.hexgl.VehicleStream = function()
 {
-    this.ws = new WebSocket("ws://" + window.location.host + "/vehicleStream");
+    console.log(window.location.host)
+    this.ws = new WebSocket("ws://" + "54.244.38.229:9000" + "/vehicleStream");
+    this.timer = null;
+
     /*this.ws.onopen = function() {
       this.ws.send("test")
     }.bind(this)*/
@@ -15,12 +19,14 @@ bkcore.hexgl.VehicleStream.prototype.sendEvent = function(name, value)
       type: "event",
       vehicle: window.hexGL.player,
       name: name,
-      value: "" + value
+      value: "" + value,
+      elapsed_time: this.timer.time.elapsed,
     }));
 };
 
 bkcore.hexgl.VehicleStream.prototype.sendLocation = function(lat, lon, elevation, speed, acceleration)
 {
+    console.log(this.timer.time.elapsed)
     this.ws.send(JSON.stringify({
       type: "location",
       vehicle: window.hexGL.player,
@@ -32,6 +38,7 @@ bkcore.hexgl.VehicleStream.prototype.sendLocation = function(lat, lon, elevation
         elevation: elevation
       },
       speed: speed,
-      acceleration: acceleration
+      acceleration: acceleration,
+      elapsed_time: this.timer.time.elapsed
     }));
 };

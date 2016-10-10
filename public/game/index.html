@@ -138,6 +138,10 @@
 
   <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 
+
+
+  </svg>
+
     <div id="step-1">
       <div id="global"></div>
       <div id="title">
@@ -156,7 +160,7 @@
           <div id="s-controlType">Controls: Keyboard</div>
           <div id="s-quality">Quality: High</div>
           <div id="s-hud">HUD: On</div>
-          <div id="s-godmode" style="display: none">Godmode: Off</div>
+          <div id="s-godmode" >Invincible: Off</div>
           <div id="s-credits">Credits</div>
         </div>
       </div>
@@ -169,7 +173,9 @@
       <div id="progressbar"></div>
     </div>
     <div id="step-4" style="display: none">
-      <div id="overlay"></div>
+      <div id="overlay">
+        <img width=80px src="imgs/headphones.svg" style="position:absolute; margin-left:10px; margin-top:10px" onclick="toggleAudio()">
+      </div>
       <div id="main"></div>
     </div>
     <div id="step-5" style="display: none">
@@ -203,7 +209,7 @@
               <div class="flip">
                 <div id="loginCard" class="card">
                   <div class="face front">
-                      <a style="color:#000000" href="https://github.com/login/oauth/authorize?client_id=42b2549bfb19824cdf0f">
+                      <a style="color:#000000" href="https://github.com/login/oauth/authorize?client_id=3c6aadc8ab2eebc9ada7">
                         <div class="col-md-12 col-sm-12 col-xs-12 login-selector" style="text-align:center;">
                           <h4><b>Login with GitHub!</b></h4>
                           <img style="padding-top: 10%; padding-bottom:5%" src="imgs/GitHub-Mark-120px-plus.png">
@@ -251,75 +257,6 @@
       </div>
     </div>
 
-    <div class="modal fade" id="leaderboardModal" >
-      <div class="modal-dialog" role="document">
-        <div class="modal-content">
-          <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-              <span aria-hidden="true">&times;</span>
-            </button>
-            <h4 class="modal-title">Leaderboard</h4>
-
-          </div>
-          <div class="modal-body" >
-
-            <table id="leaderBoardTable" class="table table-bordered">
-              <thead>
-              <tr>
-                <th style="border:0px">
-                  Username
-                </th>
-                <th style="border:0px">
-                  Fastest Lap
-                </th>
-                <th style="border:0px">
-                  Category
-                </th>
-                <th style="border:0px">
-                  Rank
-                </th>
-              </tr>
-              </thead>
-              <tbody>
-              <tr>
-                <td>
-                  Peyton
-                </td>
-                <td>
-                  01:25:15
-                </td>
-                <td>
-                  DataStax
-                </td>
-                <td>
-                  1
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  Sebastian
-                </td>
-                <td>
-                  01:26:15
-                </td>
-                <td>
-                  DataStax
-                </td>
-                <td>
-                  2
-                </td>
-              </tr>
-
-
-              </tbody>
-            </table>
-          </div>
-          <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-          </div>
-        </div>
-      </div>
-    </div>
 
 
     <script type="text/javascript" src="js/jquery-3.1.0.min.js"></script>
@@ -346,8 +283,20 @@
 
           if(github_code != null)
           {
-            $("#playerName").val(github_code);
-            login_successful();
+            $.ajax({
+              'url':  '/username/' + github_code,
+              success: function(data){
+                $("#playerName").val(data);
+                $.ajax({
+                  'url': '/populateGraph/' + data,
+                  async: true,
+                })
+                //login_successful();
+
+              }
+            })
+          }else{
+              $('#loginModal').modal('show');
           }
           $("#alternativeLogin").click(function(){
             $("#loginCard").toggleClass('flipped');
@@ -358,19 +307,32 @@
 
           })
           $("#s-leaderboard").click(function(){
-            $("#leaderboardModal").modal("show")
+            window.open("leaderboard.html", "_self");
           })
-          $('#start').click(function () {
-            $('#loginModal').modal('show');
-          });
           $("#standard_login").on("click", function(){
-            $("#playerName").val($("#username"));
+            $("#playerName").val($("#username").val());
             $('#loginModal').modal('hide');
-            login_successful();
+            //login_successful();
 //            $('step-2').style.backgroundImage = "url(css/help-" + s[0][3] + ".png)";
 //            $("#step-2").click();
           })
         });
+        function toggleAudio(){
+          if (bkcore.Audio.sounds.bg.gainNode.gain.value != 0){
+            bkcore.Audio.volume('bg',0)
+            bkcore.Audio.volume('crash',0)
+            bkcore.Audio.volume('destroy',0)
+            bkcore.Audio.volume('wind',0)
+            bkcore.Audio.volume('boost',0)
+          }else {
+            bkcore.Audio.volume('bg',.1)
+            bkcore.Audio.volume('crash',.1)
+            bkcore.Audio.volume('destroy',.1)
+            bkcore.Audio.volume('wind',.1)
+            bkcore.Audio.volume('boost',.1)
+          }
+        };
+
       </script>
 
 
